@@ -9,7 +9,10 @@
 
 int main()
 {
-    Storage sOB("Barbara",1);
+    StorageOfClothes sOB("Barbara",1);
+    sOB.add();
+    sOB.add();
+    sOB.out();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

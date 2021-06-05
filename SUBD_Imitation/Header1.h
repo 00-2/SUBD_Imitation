@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <vector>
+#include <iostream>
 
 class Storage // это абстрактный родительский класс
 {
@@ -15,4 +16,5 @@ public:
     }
     std::string getCity() { return this->city; }
     unsigned int getCapacity() { return this->capacity; }
+    virtual int add() = 0; //виртуальная функция добавления записи
 };
