@@ -1,11 +1,15 @@
-// SUBD_Imitation.cpp : This file contains the 'main' function. Program execution begins and ends there.
+﻿// SUBD_Imitation.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
+#include "Header3.h"
+#include "Header2.h"
+
+
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    Storage sOB("Barbara",1);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
