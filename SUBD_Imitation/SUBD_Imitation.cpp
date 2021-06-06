@@ -129,6 +129,13 @@ void writeAll(std::vector<StorageOfClothes> data) {
         }
     }
 }
+void writeAllToDB(std::vector<StorageOfClothes> data, std::string path) {
+    std::ofstream file(path);
+    for (auto storage : data) {
+        file << storage.toString();
+    }
+    file.close();
+}
 void menu() {
     std::cout << "\n\n----------------\n\tHello, username\n\nTo create new DB enter\"create <db name>\"\n\nToShow list of DB enter\"show databases\"\n\nToShow DB enter\"use <db name>\"\n\nToUse DB enter \"use <db name>\"\n\nToDrop DB enter \"drop <db name>\"\n\nToRenameDb enter \"rename <db name>\"\n\n ";
     std::string s;
@@ -223,7 +230,7 @@ void menu() {
                                 writeAll(selectAll(path));
                             }
                         }
-                        else if (command == "count") {
+                        else if (command == "count") {//подсчет на складе
                             std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
                             auto dataRes = selectAll(path);
                             writeAll(dataRes);
@@ -235,6 +242,66 @@ void menu() {
                                 }
                             }
                             std::cout << std::to_string(count) + " - count of products in storage\"" + name + "\"";
+                        }
+                        else if (command == "findByName") {//найти по имени
+                            std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                            auto dataRes = selectAll(path);
+                            writeAll(dataRes);
+                            int count;
+                            std::string name; std::cout << "\nInsert name:"; std::cin >> name;
+                            for (int i = 0; i < dataRes.size(); i++) {
+                                if (dataRes[i].getName() == name) {
+                                    std::vector<Clothes> tmpV = dataRes[i].getData();
+                                    std::string type;
+                                    if (tmpV.size() > 0 && tmpV[0].height != -1) {
+                                        type = "clothing";
+                                    }
+                                    else {
+                                        type = "boots";
+                                    }
+                                    for (int j = 0; j < tmpV.size(); j++) {
+                                        std::cout << std::setw(3) << i << "." << j << std::setw(8) << type
+                                            << std::setw(8) << dataRes[i].getName()
+                                            << std::setw(8) << dataRes[i].getCapacity()
+                                            << std::setw(8) << dataRes[i].getCity()
+                                            << std::setw(6) << tmpV[j].size
+                                            << std::setw(8) << tmpV[j].height
+                                            << std::endl;
+                                    }
+                                }
+                            }
+                        }
+                        else if (command == "sortByName") {
+                            std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                            auto dataRes = selectAll(path);
+                            for (int i = 0; i < dataRes.size() - 1; i++) {
+                                for (int j = 0; j < dataRes.size() - i - 1; j++) {
+                                    if (dataRes[j].getName() > dataRes[j + 1].getName()) {
+                                        // меняем элементы местами
+                                        auto temp = dataRes[j];
+                                        dataRes[j] = dataRes[j + 1];
+                                        dataRes[j + 1] = temp;
+                                    }
+                                }
+                            }
+                            writeAllToDB(dataRes, path);
+                            writeAll(dataRes);
+                        }
+                        else if (command == "sortByCapacity") {
+                        std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                        auto dataRes = selectAll(path);
+                        for (int i = 0; i < dataRes.size() - 1; i++) {
+                            for (int j = 0; j < dataRes.size() - i - 1; j++) {
+                                if (dataRes[j].getCapacity() > dataRes[j + 1].getCapacity()) {
+                                    // меняем элементы местами
+                                    auto temp = dataRes[j];
+                                    dataRes[j] = dataRes[j + 1];
+                                    dataRes[j + 1] = temp;
+                                }
+                            }
+                        }
+                        writeAllToDB(dataRes, path);
+                        writeAll(dataRes);
                         }
                         std::cout << "\n\tinsert \"exit\" to exit\n \"add\" to add data in " + VecStr[1] + "\n\"remove\" to remove record from " + VecStr[1] + "\n\"select\" to show data from " + VecStr[1] + "\n\"count\" to get count of product in storage in db" + VecStr[1] + "\n";
                         std::cin >> command;
