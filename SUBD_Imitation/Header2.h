@@ -9,8 +9,8 @@ class StorageOfBoots : public Storage
 {
 
 public:
-    StorageOfBoots(std::string t_city,unsigned int t_capacity)
-        : Storage(t_city, t_capacity)
+    StorageOfBoots(std::string t_name,std::string t_city,unsigned int t_capacity)
+        : Storage(name,t_city, t_capacity)
     {
     }
     int add() {
@@ -26,7 +26,7 @@ public:
         return 0;
     }
     std::string toString() {
-        std::string s = "\nb "+ this->city + " " + std::to_string(this->capacity) + " ";
+        std::string s = "\nb "+this->name + " " + this->city + " " + std::to_string(this->capacity) + " ";
         for (int i = 0; i < this->data.size(); i++) {
             s += std::to_string(this->data[i].size);
         }

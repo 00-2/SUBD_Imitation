@@ -29,14 +29,14 @@ Commands resolveOption(std::string input) {
 }
 
 
-void showDatabases() {
+void showDatabases() {//показать список баз данных
 
     std::string path = fs::current_path().u8string()+"/db";
 
     for (const auto& entry : fs::directory_iterator(path))
         std::cout << entry.path().filename() << std::endl;
 }
-void createDatabase(std::string s) {
+void createDatabase(std::string s) {//создать базу данных
     std::string path = fs::current_path().u8string() + "\\db\\";
     path += s;
     std::ofstream file(path);
@@ -44,14 +44,14 @@ void createDatabase(std::string s) {
     file << data;
     file.close();
 }
-void dropDatabase(std::string path) {
+void dropDatabase(std::string path) {//удалить базу данных
     fs::remove(path);
 }
-void renameDatabase(std::string path) {
+void renameDatabase(std::string path) {//переименовать базу данных
     std::string s; std::cout << "\nInsert new name:"; std::cin >> s; s = fs::current_path().u8string() + "\\db\\" + s;
     fs::rename(path,s);
 }
-void appendRecord(std::string data, std::string path) {
+void appendRecord(std::string data, std::string path) {//добавить запись
     std::ofstream file(path, std::ios_base::app);
     file << data;
     file.close();
@@ -66,28 +66,69 @@ bool exist(std::string filename) {
     }
     return false;
 }
-void selectAll(std::string path) {
-    std::cout << "ID "
-        << std::setw(6) << "type"
-        << std::setw(12) << "capacity"
-        << std::setw(6) << "city"
-        << std::setw(6) << "size"
-        << std::setw(8) << "height"
-        << std::endl;
+std::vector<StorageOfClothes> selectAll(std::string path) {
     std::ifstream in(path);
     std::string line;
     int id = 0;
-    
+    std::vector<StorageOfClothes> dataRes;//представление db
     while (std::getline(in, line))
     {
         std::istringstream iss(line);
         char type;
-        if (!(iss >> type)) { break; } // error
+        unsigned int capacity;
+        std::string city,name;
+        if (!(iss >> type >>name>> city >> capacity)) { break; } // error
+        StorageOfClothes tmpSOC(name,city, capacity);
         if (type == 'c') {
-            iss >>  
+            std::cout << "\nc";
+            Clothes tmpObject;
+            std::vector<Clothes> data;
+            while (iss >> tmpObject.size >> tmpObject.height) {
+                data.push_back(tmpObject);
+            }
+            tmpSOC.setData(data);
         }
-
-        // process pair (a,b)
+        else {
+            std::cout << "\nb";
+            Clothes tmpObject;
+            std::vector<Clothes> data;
+            while (iss >> tmpObject.size) {
+                tmpObject.height = -1;
+                data.push_back(tmpObject);
+            }
+            tmpSOC.setData(data);
+        }
+        dataRes.push_back(tmpSOC);
+    }
+    return dataRes;
+}
+void writeAll(std::vector<StorageOfClothes> data) {
+    std::cout<<std::setw(3) << "\nID "
+        << std::setw(8) << "type"
+        << std::setw(8) << "name"
+        << std::setw(8) << "capacity"
+        << std::setw(8) << "city"
+        << std::setw(6) << "size"
+        << std::setw(8) << "height"
+        << std::endl;
+    for (int i = 0; i < data.size(); i++) {
+        std::vector<Clothes> tmpV = data[i].getData();
+        std::string type;
+        if (tmpV.size()>0 && tmpV[0].height != -1) {
+            type = "clothing";
+        }
+        else {
+            type = "boots";
+        }
+        for (int j = 0; j < tmpV.size(); j++) {
+            std::cout<< std::setw(3) <<i<<"."<<j << std::setw(8) << type
+                << std::setw(8) << data[i].getName()
+                << std::setw(8) << data[i].getCapacity()
+                << std::setw(8) << data[i].getCity()
+                << std::setw(6) << tmpV[j].size
+                << std::setw(8) << tmpV[j].height
+                << std::endl;
+        }
     }
 }
 void menu() {
@@ -104,11 +145,7 @@ void menu() {
         switch (resolveOption(VecStr[0]))
         {
         case show:
-            if (VecStr.size() == 3 && VecStr[1] == "database") {
-                //вывести бд
-                break;
-            }
-            else if (VecStr.size() == 2 && VecStr[1] == "databases") {
+            if (VecStr.size() == 2 && VecStr[1] == "databases") {
                 showDatabases();
                 break;
             }
@@ -140,13 +177,14 @@ void menu() {
                                 std::cout << "\nclassification - insert (0(for boots)/1(for clothing)) ";
                                 std::cin >> classification;
                             }
-                            std::string city;
+                            std::string city,name;
                             unsigned int capacity;
+                            std::cout << "Insert name:"; std::cin >> name;
                             std::cout << "Insert city:"; std::cin >> city;
                             std::cout << "Insert capacity:"; std::cin >> capacity;
                             int n; std::cout << "How many records u want add? "; std::cin >> n;
                             if (classification == "1") {
-                                StorageOfClothes sOC(city, capacity); //добавляем склад одежды
+                                StorageOfClothes sOC(name, city, capacity); //добавляем склад одежды
                                 for (int i = 0; i < n; i++) {
                                     sOC.add();
                                 }
@@ -154,7 +192,7 @@ void menu() {
                                 appendRecord(sOC.toString(), fs::current_path().u8string() + "\\db\\" + VecStr[1]);
                             }
                             else {
-                                StorageOfBoots sOB(city, capacity); //добавляем склад обуви
+                                StorageOfBoots sOB(name, city, capacity); //добавляем склад обуви
                                 for (int i = 0; i < n; i++) {
                                     sOB.add();
                                 }
@@ -165,8 +203,25 @@ void menu() {
                         }
                         else if (command == "remove") {
                             int count;
-                            std::string path = fs::current_path().u8string() + "\\db\\" + dbInUse;
-                            selectAll(path);
+                            std::string city;
+                            unsigned int capacity;
+                            std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                            auto dataRes = selectAll(path);
+                            writeAll(dataRes);
+                            std::cout << "\ninsert attributes(city, capacity) of storage:\ncity:"; std::cin >> city; std::cout << "\ncapacity:"; std::cin >> capacity;
+                            for (int i = 0; i < dataRes.size(); i++) {
+                                if (dataRes[i].getCapacity() == capacity && dataRes[i].getCity() == city) {
+                                    dataRes.erase(dataRes.begin() + i);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (command == "select") {
+                            std::string describe;
+                            std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                            if (describe == "*") {
+                                writeAll(selectAll(path));
+                            }
                         }
                         std::cout << "\n\tinsert \"exit\" to exit\n \"add\" to add data in " + VecStr[1] + "\n\"remove\" to remove record from " + VecStr[1] + "\n\"select\" to show data from " + VecStr[1] + "\n";
                         std::cin >> command;
@@ -217,7 +272,9 @@ void menu() {
 int main()
 {
     std::cout << "Greetings From Your's new SUBD";
-    menu();
+    std::string path = fs::current_path().u8string() + "\\db\\db2.txt";
+    writeAll(selectAll(path));
+    //menu();
     //StorageOfClothes sOB("Barbara",1);
     //sOB.add();
     //sOB.add();
