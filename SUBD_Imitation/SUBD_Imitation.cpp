@@ -80,7 +80,6 @@ std::vector<StorageOfClothes> selectAll(std::string path) {
         if (!(iss >> type >>name>> city >> capacity)) { break; } // error
         StorageOfClothes tmpSOC(name,city, capacity);
         if (type == 'c') {
-            std::cout << "\nc";
             Clothes tmpObject;
             std::vector<Clothes> data;
             while (iss >> tmpObject.size >> tmpObject.height) {
@@ -89,7 +88,6 @@ std::vector<StorageOfClothes> selectAll(std::string path) {
             tmpSOC.setData(data);
         }
         else {
-            std::cout << "\nb";
             Clothes tmpObject;
             std::vector<Clothes> data;
             while (iss >> tmpObject.size) {
@@ -132,7 +130,7 @@ void writeAll(std::vector<StorageOfClothes> data) {
     }
 }
 void menu() {
-    std::cout << "\n\nHello, username\n\nTo create new DB enter\"create <db name>\"\n\nToShow list of DB enter\"show databases\"\n\nToShow DB enter\"show database <db name>\"\n\nToUse DB enter \"use <db name>\"\n\nToDrop DB enter \"drop <db name>\"\n\nToRenameDb enter \"rename <db name>\"\n\n ";
+    std::cout << "\n\n----------------\n\tHello, username\n\nTo create new DB enter\"create <db name>\"\n\nToShow list of DB enter\"show databases\"\n\nToShow DB enter\"use <db name>\"\n\nToUse DB enter \"use <db name>\"\n\nToDrop DB enter \"drop <db name>\"\n\nToRenameDb enter \"rename <db name>\"\n\n ";
     std::string s;
     std::getline(std::cin,s);
     std::vector<std::string> VecStr;
@@ -219,6 +217,8 @@ void menu() {
                         else if (command == "select") {
                             std::string describe;
                             std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                            std::cout << "\n* - show all\n1-show 1\n2-show 2";
+                            std::cin >> describe;
                             if (describe == "*") {
                                 writeAll(selectAll(path));
                             }
@@ -273,8 +273,8 @@ int main()
 {
     std::cout << "Greetings From Your's new SUBD";
     std::string path = fs::current_path().u8string() + "\\db\\db2.txt";
-    writeAll(selectAll(path));
-    //menu();
+    //writeAll(selectAll(path));
+    while(true)menu();
     //StorageOfClothes sOB("Barbara",1);
     //sOB.add();
     //sOB.add();
