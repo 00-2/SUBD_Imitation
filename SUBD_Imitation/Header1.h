@@ -17,4 +17,6 @@ public:
     std::string getCity() { return this->city; }
     unsigned int getCapacity() { return this->capacity; }
     virtual int add() = 0; //виртуальная функция добавления записи
+    virtual std::string toString() = 0;//виртуальная функция визуализации склада
+
 };

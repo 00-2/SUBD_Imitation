@@ -27,12 +27,13 @@ public:
         std::cout << "\nStorage Full";
         return 0;
     }
-    int out() {
-            std::cout << "\n";
-            for (int i = 0; i < this->data.size(); i++) {
-                std::cout << data[i].size << "\\" << data[i].height << " ";
-            }
-            return 1;
+    std::string toString() {
+        std::string s = "\nc " + this->city + " " + std::to_string(this->capacity)+ " ";
+        for (int i = 0; i < this->data.size(); i++) {
+            s += std::to_string(this->data[i].size) + " " + std::to_string(this->data[i].height);
+        }
+        s += "\n";
+        return s;
     }
 protected:
     std::vector<Clothes> data;
