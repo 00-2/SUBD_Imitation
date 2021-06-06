@@ -10,7 +10,9 @@
 #include <iomanip>
 
 namespace fs = std::filesystem;
-
+#define useStr "\n\tinsert \"exit\" to exit\n \"add\" to add data in " + VecStr[1] + "\n\"remove\" to remove record from " + VecStr[1] + "\n\"select\" to show data from " + VecStr[1] + "\n\"count\" to count data from Storage from db " + VecStr[1] + "\n"
+#define addUseStr "\n\"findByName\" to findByName storage from " + VecStr[1] +"\n\"sortByName\" to sort storages by name from " + VecStr[1] +"\n\"sortByCapacity to sort storages by capacity from " + VecStr[1]
+#define anotherAddUseStr "\n\"chooseLittleBig\" to choose storages with low/big sizes(choose in body) from " + VecStr[1] + "\n\"chooseValue\" to choose storages with value (choose in body) from " + VecStr[1] 
 enum Commands {
     Option_Invalid,
     show,
@@ -165,12 +167,12 @@ void menu() {
                 std::cout << "\nCommand was not responced";
             }
             break;
-
+          
         case use:
             if (VecStr.size()==2){
                 if (exist(VecStr[1])) {
                     std::string dbInUse = VecStr[1];//аргумент - название файла
-                    std::cout << "\n\tinsert \"exit\" to exit\n \"add\" to add data in " + VecStr[1] + "\n\"remove\" to remove record from " + VecStr[1] + "\n\"select\" to show data from " + VecStr[1] + "\n";
+                    std::cout << useStr + addUseStr + anotherAddUseStr;
                     std::string command = "";
                     std::cin >> command;
                     while (command != "exit") {
@@ -207,7 +209,7 @@ void menu() {
                             std::string data;
                         }
                         else if (command == "remove") {
-                            int count;
+                           
                             std::string city;
                             unsigned int capacity;
                             std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
@@ -224,7 +226,7 @@ void menu() {
                         else if (command == "select") {
                             std::string describe;
                             std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
-                            std::cout << "\n* - show all\n1-show 1\n2-show 2";
+                            std::cout << "\n* - show all";
                             std::cin >> describe;
                             if (describe == "*") {
                                 writeAll(selectAll(path));
@@ -303,7 +305,76 @@ void menu() {
                         writeAllToDB(dataRes, path);
                         writeAll(dataRes);
                         }
-                        std::cout << "\n\tinsert \"exit\" to exit\n \"add\" to add data in " + VecStr[1] + "\n\"remove\" to remove record from " + VecStr[1] + "\n\"select\" to show data from " + VecStr[1] + "\n\"count\" to get count of product in storage in db" + VecStr[1] + "\n";
+                        else if (command == "chooseLittleBig") {
+                            std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                            auto data = selectAll(path);
+                            std::vector<StorageOfClothes> dataResBig,dataResLittle;
+                            for (int i = 0; i < data.size(); i++) {
+                                std::vector<Clothes> tmpV = data[i].getData();
+                                for (int j = 0; j < data.size(); j++) {
+                                    if (tmpV[j].height == -1) {
+                                        if (tmpV[j].size >= 45) { dataResBig.push_back(data[i]); }
+                                        if (tmpV[j].size <= 36) { dataResLittle.push_back(data[i]); }
+                                    }
+                                    else {
+                                        if (tmpV[j].size >= 50) {
+                                            dataResBig.push_back(data[i]); break;
+                                        }
+                                        if (tmpV[j].size <= 40) {
+                                            dataResLittle.push_back(data[i]);
+                                        }
+                                    }
+                                }
+                            }
+                            std::string tmp;
+                            std::cout << "\nLittle/Big"; std::cin >> tmp;
+                            while (tmp != "Little" || tmp != "Big") {
+                                std::cout << "\nLittle/Big"; std::cin >> tmp;
+                            }
+                            std::vector<StorageOfClothes> dataRes;
+                            if (tmp == "Little") { dataRes = dataResLittle; writeAll(dataRes); }
+                            if (tmp == "Big") { dataRes = dataResBig; writeAll(dataRes); }
+                            
+                            std::cout << "\nU want to save in DB?(y/n)"; std::cin >> tmp;
+                            while (tmp != "y" || tmp != "n") {
+                                std::cout << "\nU want to save in DB?(y/n)"; std::cin >> tmp;
+                            }
+                            if (tmp == "y") {
+                                std::string filename;
+                                std::cin >> filename;
+                                std::string path = fs::current_path().u8string() + "\\db\\" + filename;
+                                writeAllToDB(dataRes, path);
+                            }
+                        }
+                        
+                        else if (command == "chooseByValue") {
+                        std::string path = fs::current_path().u8string() + "\\db\\" + VecStr[1];
+                        auto data = selectAll(path);
+                        std::vector<StorageOfClothes> dataRes;
+                        int value;
+                        std::cout << "\nCapacity:";
+                        std::cin >> value;
+                        for (int i = 0; i < data.size(); i++) {
+                            if (value>data[i].getCapacity()) {
+                                dataRes.push_back(data[i]);
+                            }
+                        }
+                        std::string tmp;
+                        
+                        std::cout << "\nU want to save in DB?(y/n)"; std::cin >> tmp;
+                        while (tmp != "y" || tmp != "n") {
+                            std::cout << "\nU want to save in DB?(y/n)"; std::cin >> tmp;
+                        }
+                        if (tmp == "y") {
+                            std::string filename;
+                            std::cin >> filename;
+                            std::string path = fs::current_path().u8string() + "\\db\\" + filename;
+                            writeAllToDB(dataRes, path);
+                        }
+                        }
+
+
+                        std::cout << useStr+addUseStr+anotherAddUseStr;
                         std::cin >> command;
                     }
                 }
