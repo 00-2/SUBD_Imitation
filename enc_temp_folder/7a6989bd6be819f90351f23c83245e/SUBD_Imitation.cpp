@@ -228,7 +228,7 @@ void menu() {
                             auto dataRes = selectAll(path);
                             writeAll(dataRes);
                             int count;
-                            std::string name; std::cout << "\nInsert name:"; std::cin >> name;
+                            std::string name; std::cout << "Insert name"; std::cin >> name;
                             for (int i = 0; i < dataRes.size(); i++) {
                                 if (dataRes[i].getName() == name) {
                                     count = dataRes[i].count();

@@ -14,6 +14,9 @@ public:
         : Storage(t_name, t_city, t_capacity)
     {
     }
+    int count() {
+        return data.size();
+    }
     int add() {
         std::cout << "\nAdding into StorageOfClothes";
         if (this->data.size() < capacity) {
